@@ -15,10 +15,12 @@ def sendSMS(number, message = "Yo!"):
   data = {"number":number, "message":message}
   requests.post("http://textbelt.com/text", data = data)
 
-@app.route("/yo")
+@app.route("/yo", methods=['GET'])
 ###############################################################################
 def yo():
-  data = {"callerID":"Yo!", "extension":27000}
+  username = flask.request.args.get('username')
+  yo_text = "Yo! from " + username
+  data = {"callerID":yo_text, "extension":27000}
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
   print "Yo Get"
   for number in phoneNumbers:
