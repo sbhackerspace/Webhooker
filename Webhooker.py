@@ -1,9 +1,11 @@
 #!/usr/bin/python
 import json
+from flask import jsonify
 import requests
 
 import flask
 app = flask.Flask(__name__)
+#app.config['DEBUG'] = True
 
 @app.route("/")
 ###############################################################################
@@ -19,13 +21,12 @@ def sendSMS(number, message = "Yo!"):
 ###############################################################################
 def yo():
   username = flask.request.args.get('username')
-  yo_text = "Yo! from " + username
+  yo_text = "Yo!"
+  if username is not None:  
+    yo_text = "Yo! from " + username
   data = {"callerID":yo_text, "extension":27000}
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
-  print "Yo Get"
-  for number in phoneNumbers:
-    sendSMS(number)
-  return 'yo'
+  return 'yo', 200
 
 @app.route("/github")
 ###############################################################################
