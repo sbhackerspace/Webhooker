@@ -8,6 +8,10 @@ from flask import jsonify
 import requests
 
 import flask
+import hmac
+from hashlib import sha1
+from django.utils.crypto import constant_time_compare
+
 app = flask.Flask(__name__)
 
 ###############################################################################
@@ -39,7 +43,7 @@ def github():
     githubSignature = flask.request.headers.get('X_HUB_SIGNATURE')[5:]
 
     localSignature = \
-      hmac.new(getSecretGithubKey(), flask.request.get_data(), sha1).hexdigest()
+      hmac.new(getGithubSecretKey(), flask.request.get_data(), sha1).hexdigest()
     if constant_time_compare(githubSignature, localSignature):
       triggerHorn()
   except Exception as e:
