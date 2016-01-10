@@ -1,4 +1,8 @@
 #!/usr/bin/python
+
+from TriggerHorn import triggerHorn
+from SecretKey import getGithubSecretKey
+
 import json
 from flask import jsonify
 import requests
@@ -22,7 +26,7 @@ def sendSMS(number, message = "Yo!"):
 def yo():
   username = flask.request.args.get('username')
   yo_text = "Yo!"
-  if username is not None:  
+  if username is not None:
     yo_text = "Yo! from " + username
   data = {"callerID":yo_text, "extension":27000}
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
@@ -31,11 +35,17 @@ def yo():
 @app.route("/github", methods=['POST'])
 ###############################################################################
 def github():
-  print "github Post"
-  arguments = flask.request.data
-  print arguments
-  request.get("http://10.18.14.56/horn")
-  return 'guthub', 200
+  data = flask.request.get_json()
+  try:
+    githubSignature = flask.request.headers.get('X_HUB_SIGNATURE')[5:]
+
+    localSignature = \
+      hmac.new(getSecretGithubKey(), flask.request.get_data(), sha1).hexdigest()
+    if constant_time_compare(githubSignature, localSignature):
+      triggerHorn()
+  except Exception as e:
+    pass
+  return 'github', 200
 
 ###############################################################################
 ###############################################################################
