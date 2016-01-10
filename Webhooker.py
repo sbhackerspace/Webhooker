@@ -28,11 +28,13 @@ def yo():
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
   return 'yo', 200
 
-@app.route("/github")
+@app.route("/github", methods=['POST'])
 ###############################################################################
 def github():
   print "github Post"
-  requests.post("http://horn.local/horn")
+  arguments = flask.request.data
+  print arguments
+  request.get("http://10.18.14.56/horn")
   return 'guthub', 200
 
 ###############################################################################
