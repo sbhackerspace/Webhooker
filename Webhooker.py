@@ -11,8 +11,8 @@ import flask
 app = flask.Flask(__name__)
 #app.config['DEBUG'] = True
 
-@app.route("/")
 ###############################################################################
+@app.route("/")
 def hello():
   return "Webhooks Options:\n \n\\yo \n\\github"
 
@@ -21,8 +21,8 @@ def sendSMS(number, message = "Yo!"):
   data = {"number":number, "message":message}
   requests.post("http://textbelt.com/text", data = data)
 
-@app.route("/yo", methods=['GET'])
 ###############################################################################
+@app.route("/yo", methods=['GET'])
 def yo():
   username = flask.request.args.get('username')
   yo_text = "Yo!"
@@ -32,8 +32,8 @@ def yo():
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
   return 'yo', 200
 
-@app.route("/github", methods=['POST'])
 ###############################################################################
+@app.route("/github", methods=['POST'])
 def github():
   data = flask.request.get_json()
   try:
