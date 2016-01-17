@@ -41,7 +41,7 @@ def github():
 ###############################################################################
 if __name__ == "__main__":
   try:
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='::', port=80)
   except:
     print 'shit failed'
     exit()
