@@ -81,6 +81,8 @@ def github():
     localSignature = \
       hmac.new(getGithubSecretKey(), flask.request.get_data(), sha1).hexdigest()
     if constant_time_compare(githubSignature, localSignature):
+      data = {"callerID":"Yo! from SBHXGITHUB", "extension":27000}
+      requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
       triggerHorn()
   except Exception as e:
     pass
