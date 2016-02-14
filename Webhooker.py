@@ -7,6 +7,7 @@ import json
 from flask import jsonify
 import requests
 
+import datetime
 import flask
 import hmac
 from hashlib import sha1
@@ -15,10 +16,19 @@ from django.utils.crypto import constant_time_compare
 app = flask.Flask(__name__)
 
 ###############################################################################
+def IsAuthorized(username):
+  if username in ['LOMANCER', 'MIKEKAPUSCIK', 'SLAPPLEBAGS']:
+    return True
+  elif 8 <= datetime.datetime.now().hour <= 20:
+    return True
+  else:
+    return False
+
+###############################################################################
 @app.route("/")
 def hello():
-  return "Webhooks Options:\n \n\\yo \n\\yoworkroomlights " + \
-    "\n\\yoclassroomlights \n\\github"
+  return "Webhooks Options:\n \n\\yo \n\\yolights " + \
+    "\n\\yoworkroomlights \n\\yoclassroomlights \n\\github"
 
 ###############################################################################
 def sendSMS(number, message = "Yo!"):
@@ -37,15 +47,28 @@ def yo():
   return 'yo', 200
 
 ###############################################################################
+@app.route("/yolights", methods=['GET'])
+def yoLights():
+  username = flask.request.args.get('username')
+  if IsAuthorized(username):
+    requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
+    requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
+  return 'yo', 200
+
+###############################################################################
 @app.route("/yoclassroomlights", methods=['GET'])
 def yoClassroomLights():
-  requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
+  username = flask.request.args.get('username')
+  if IsAuthorized(username):
+    requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
 
 ###############################################################################
 @app.route("/yoworkroomlights", methods=['GET'])
 def yoWorkroomLigts():
-  requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
+  username = flask.request.args.get('username')
+  if IsAuthorized(username):
+    requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
 
 ###############################################################################
