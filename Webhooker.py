@@ -17,7 +17,8 @@ app = flask.Flask(__name__)
 ###############################################################################
 @app.route("/")
 def hello():
-  return "Webhooks Options:\n \n\\yo \n\\github"
+  return "Webhooks Options:\n \n\\yo \n\\yoworkroomlights " + \
+    "\n\\yoclassroomlights \n\\github"
 
 ###############################################################################
 def sendSMS(number, message = "Yo!"):
@@ -33,6 +34,18 @@ def yo():
     yo_text = "Yo! from " + username
   data = {"callerID":yo_text, "extension":27000}
   requests.post("http://asterisk-02.west.sbhackerspace.com:8080/all", data = data)
+  return 'yo', 200
+
+###############################################################################
+@app.route("/yoclassroomlights", methods=['GET'])
+def yoClassroomLights():
+  requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
+  return 'yo', 200
+
+###############################################################################
+@app.route("/yoworkroomlights", methods=['GET'])
+def yoWorkroomLigts():
+  requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
 
 ###############################################################################
