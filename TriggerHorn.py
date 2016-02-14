@@ -29,7 +29,7 @@ def triggerHorn():
     'nonce' : nonce.encode("hex"), \
     'time' : localTime}
   try:
-    requests.post('http://horn.local/horn', data = data)
+    requests.post('http://horn.local/horn', data = data, timeout=1)
   except Exception:
     return
 
