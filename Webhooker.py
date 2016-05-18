@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from TriggerHorn import triggerHorn
-from SecretKey import getGithubSecretKey
+from TriggerHorn import *
+from SecretKey import *
 
 import json
 from flask import jsonify
@@ -10,13 +10,14 @@ import requests
 import datetime
 import flask
 import hmac
+import time
 from hashlib import sha1
 from django.utils.crypto import constant_time_compare
 
 app = flask.Flask(__name__)
 
 ###############################################################################
-def IsAuthorized(username):
+def isAuthorized(username):
   if username in ['LOMANCER', 'MIKEKAPUSCIK', 'SLAPPLEBAGS']:
     return True
   elif 8 <= datetime.datetime.now().hour <= 20:
@@ -25,10 +26,17 @@ def IsAuthorized(username):
     return False
 
 ###############################################################################
+def isAuthenticated(key, nonce, localTime, oneTimePassword):
+  localOneTimePassword = getOneTimePassword(key, nonce, localTime)
+  validHash = constant_time_compare(localOneTimePassword, oneTimePassword)
+  validTimeDifference = abs(time.mktime(time.localtime()) - localTime) < 3
+  return validHash and validTimeDifference
+
+###############################################################################
 @app.route("/")
 def hello():
-  return "Webhooks Options:\n \n\\yo \n\\yolights " + \
-    "\n\\yoworkroomlights \n\\yoclassroomlights \n\\github"
+  return "Webhooks Options:\n \n/yo \n/yolights " + \
+    "\n/yoworkroomlights \n/yoclassroomlights \n/github \n/sendyo"
 
 ###############################################################################
 def sendSMS(number, message = "Yo!"):
@@ -50,7 +58,7 @@ def yo():
 @app.route("/yolights", methods=['GET'])
 def yoLights():
   username = flask.request.args.get('username')
-  if IsAuthorized(username):
+  if isAuthorized(username):
     requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
     requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
@@ -59,7 +67,7 @@ def yoLights():
 @app.route("/yoclassroomlights", methods=['GET'])
 def yoClassroomLights():
   username = flask.request.args.get('username')
-  if IsAuthorized(username):
+  if isAuthorized(username):
     requests.get("http://classroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
 
@@ -67,7 +75,7 @@ def yoClassroomLights():
 @app.route("/yoworkroomlights", methods=['GET'])
 def yoWorkroomLigts():
   username = flask.request.args.get('username')
-  if IsAuthorized(username):
+  if isAuthorized(username):
     requests.get("http://workroom-lights.west.sbhackerspace.com/toggle")
   return 'yo', 200
 
@@ -87,6 +95,19 @@ def github():
   except Exception as e:
     pass
   return 'github', 200
+
+###############################################################################
+@app.route("/sendyo", methods=['POST'])
+def sendYo():
+  inputData = flask.request.form
+  nonce = str(inputData['nonce'])
+  networkOneTimePassword = str(inputData['otp'])
+  localTime = float(inputData['time'])
+
+  if isAuthenticated(getYoSecretKey(), nonce, localTime, networkOneTimePassword):
+    data = {'api_token' : getYoApiKey()}
+    requests.post('https://api.justyo.co/yoall/', data = data)
+  return 'Yo Sent', 200
 
 ###############################################################################
 ###############################################################################

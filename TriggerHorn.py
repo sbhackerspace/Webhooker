@@ -8,7 +8,7 @@ import hashlib
 import random
 import requests
 import time
-from SecretKey import getSecretKey
+from SecretKey import getHornSecretKey
 
 ################################################################################
 def getOneTimePassword(key, nonce, localTime):
@@ -25,7 +25,7 @@ def triggerHorn():
   nonce = getNonce()
   localTime = time.mktime(time.localtime())
   data = \
-    {'otp' : getOneTimePassword(getSecretKey(), nonce, localTime), \
+    {'otp' : getOneTimePassword(getHornSecretKey(), nonce, localTime), \
     'nonce' : nonce.encode("hex"), \
     'time' : localTime}
   try:
