@@ -11,6 +11,7 @@ import datetime
 import flask
 import hmac
 import time
+import ast
 from hashlib import sha1
 from django.utils.crypto import constant_time_compare
 
@@ -26,10 +27,10 @@ def isAuthorized(username):
     return False
 
 ###############################################################################
-def isAuthenticated(key, nonce, localTime, oneTimePassword):
-  localOneTimePassword = getOneTimePassword(key, nonce, localTime)
+def isAuthenticated(key, nonce, networkTime, oneTimePassword):
+  localOneTimePassword = getOneTimePassword(key, nonce, networkTime)
   validHash = constant_time_compare(localOneTimePassword, oneTimePassword)
-  validTimeDifference = abs(time.mktime(time.localtime()) - localTime) < 3
+  validTimeDifference = abs(time.mktime(time.localtime()) - networkTime) < 3
   return validHash and validTimeDifference
 
 ###############################################################################
@@ -99,7 +100,8 @@ def github():
 ###############################################################################
 @app.route("/sendyo", methods=['POST'])
 def sendYo():
-  inputData = flask.request.form
+  inputData = ast.literal_eval(flask.request.form.keys()[0])
+
   nonce = str(inputData['nonce'])
   networkOneTimePassword = str(inputData['otp'])
   localTime = float(inputData['time'])
