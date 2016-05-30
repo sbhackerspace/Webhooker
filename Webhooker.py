@@ -28,9 +28,10 @@ def isAuthorized(username):
 
 ###############################################################################
 def isAuthenticated(key, nonce, networkTime, oneTimePassword):
+  currentTime = time.mktime(time.localtime())
   localOneTimePassword = getOneTimePassword(key, nonce, networkTime)
   validHash = constant_time_compare(localOneTimePassword, oneTimePassword)
-  validTimeDifference = abs(time.mktime(time.localtime()) - networkTime) < 3
+  validTimeDifference = abs(currentTime - networkTime) < 3
   return validHash and validTimeDifference
 
 ###############################################################################
