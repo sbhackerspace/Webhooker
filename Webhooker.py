@@ -12,6 +12,8 @@ import flask
 import hmac
 import time
 import ast
+import multiprocessing
+import Phone
 from hashlib import sha1
 from django.utils.crypto import constant_time_compare
 
@@ -97,6 +99,23 @@ def github():
   except Exception as e:
     pass
   return 'github', 200
+
+###############################################################################
+@app.route("/asterisk", methods=['GET'])
+def asterisk():
+  try:
+    print 'fuck '
+    status = flask.request.args.get('status')
+    print status
+    if status == "incoming":
+      print 'starting'
+      gProcess = multiprocessing.Process(target=Phone.triggerPhone())
+      gProcess.start()
+
+  except Exception as e:
+    print e
+  print 'returning'
+  return 'asterisk status received', 200
 
 ###############################################################################
 @app.route("/sendyo", methods=['POST'])
